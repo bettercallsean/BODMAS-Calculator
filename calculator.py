@@ -1,9 +1,7 @@
-calc = [3, '+', '(', '(', 4, '+', 6, ')', '*', 9, '/', '(', 2, '-', 16, '+', 8, '*', '(', 3, '^', 2, '+', 7, ')', ')',
-         ')', '/', 3, '*', 6, '*', 4, '-', 7]
-
+# 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself 
 
 def solve(calculation):
-    precedence = {"^": 5, "÷": 4, "/": 4, "×": 3, "*": 3, "+": 2, "-": 2}
+    precedence = {"^": 5, "/": 4, "*": 3, "+": 2, "-": 2}
     bodmasIndex = []
     calcArray = calculation
     highestOperatorIndex = 0
@@ -71,6 +69,7 @@ def bracketSolver(calculation):
             else:
                 bracketPairs[startBracketIndex[i]] = endBracketIndex[x]
                 break
+        break
     if len(bracketPairs) != 0:
         return bracketPairs
 
@@ -89,5 +88,31 @@ def calculator(calculation):
         print(calculation)
         return calculator(calculation)
 
-ans = calculator(calc)
+
+def calcInput():
+    calcArray = []
+    calculation = input('Enter your calculation: ')
+    done = []
+
+    for i in range(len(calculation)):
+        try:
+            if i in done:
+                continue
+            elif isinstance(int(calculation[i]), int):
+                num = calculation[i]
+                for x in range(i+1, len(calculation[i + 1:])):
+                    try:
+                        if isinstance(int(calculation[x]), int):
+                            num = num + calculation[x]
+                            done.append(x)
+                    except ValueError:
+                        break
+                calcArray.append(int(num))
+        except ValueError:
+            calcArray.append(calculation[i])
+
+    return calculator(calcArray)
+
+
+ans = calcInput()
 print(ans)
