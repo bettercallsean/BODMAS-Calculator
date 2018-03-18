@@ -1,24 +1,24 @@
-# 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself 
+# 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself
+
 
 def solve(calculation):
     precedence = {"^": 5, "/": 4, "*": 3, "+": 2, "-": 2}
     bodmasIndex = []
-    calcArray = calculation
     highestOperatorIndex = 0
     calc = ""
 
-    for i in range(len(calcArray)):
-        calc += str(calcArray[i])
-        if calcArray[i] in precedence:
+    for i in range(len(calculation)):
+        calc += str(calculation[i])
+        if calculation[i] in precedence:
             if len(bodmasIndex) == 0:  # starts off the bodmasIndex list with a value (this is only executed once)
                 bodmasIndex.append(i)
             else:
                 highestOperatorIndex = i
                 for x in range(len(bodmasIndex)):  # for each of the values stored in bodmasIndex
-                    if precedence[calcArray[i]] > precedence[calcArray[bodmasIndex[x]]]:
+                    if precedence[calculation[i]] > precedence[calculation[bodmasIndex[x]]]:
                         bodmasIndex.insert(x, i)  # insert the index value
                         break
-                    elif precedence[calcArray[i]] == precedence[calcArray[bodmasIndex[x]]]:
+                    elif precedence[calculation[i]] == precedence[calculation[bodmasIndex[x]]]:
                         bodmasIndex.insert(x + 1, i)
                         break
                     else:
@@ -27,26 +27,26 @@ def solve(calculation):
 
     for i in range(len(bodmasIndex)):
 
-        if calcArray[bodmasIndex[0]] == '^':
-            currentCalculation = float(calcArray[bodmasIndex[0] - 1]) ** float(calcArray[bodmasIndex[0] + 1])
-        elif calcArray[bodmasIndex[0]] == '/':
-            currentCalculation = float(calcArray[bodmasIndex[0] - 1]) / float(calcArray[bodmasIndex[0] + 1])
-        elif calcArray[bodmasIndex[0]] == '*':
-            currentCalculation = float(calcArray[bodmasIndex[0] - 1]) * float(calcArray[bodmasIndex[0] + 1])
-        elif calcArray[bodmasIndex[0]] == '+':
-            currentCalculation = float(calcArray[bodmasIndex[0] - 1]) + float(calcArray[bodmasIndex[0] + 1])
+        if calculation[bodmasIndex[0]] == '^':
+            currentCalculation = float(calculation[bodmasIndex[0] - 1]) ** float(calculation[bodmasIndex[0] + 1])
+        elif calculation[bodmasIndex[0]] == '/':
+            currentCalculation = float(calculation[bodmasIndex[0] - 1]) / float(calculation[bodmasIndex[0] + 1])
+        elif calculation[bodmasIndex[0]] == '*':
+            currentCalculation = float(calculation[bodmasIndex[0] - 1]) * float(calculation[bodmasIndex[0] + 1])
+        elif calculation[bodmasIndex[0]] == '+':
+            currentCalculation = float(calculation[bodmasIndex[0] - 1]) + float(calculation[bodmasIndex[0] + 1])
         else:
-            currentCalculation = float(calcArray[bodmasIndex[0] - 1]) - float(calcArray[bodmasIndex[0] + 1])
+            currentCalculation = float(calculation[bodmasIndex[0] - 1]) - float(calculation[bodmasIndex[0] + 1])
 
-        calcArray[bodmasIndex[0] - 1] = currentCalculation
-        calcArray.pop(bodmasIndex[0] + 1)
-        calcArray.pop(bodmasIndex[0])
+        calculation[bodmasIndex[0] - 1] = currentCalculation
+        calculation.pop(bodmasIndex[0] + 1)
+        calculation.pop(bodmasIndex[0])
 
-        if len(calcArray) != 1:
+        if len(calculation) != 1:
             bodmasIndex.remove(highestOperatorIndex)
         highestOperatorIndex -= 2
 
-    return calcArray[0]
+    return calculation[0]
 
 
 def bracketSolver(calculation):
