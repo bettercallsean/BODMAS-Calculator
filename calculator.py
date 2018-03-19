@@ -1,10 +1,10 @@
 # 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself
+# 7^3+3*(4*5-2^2-28/7+3)+9+((3+5)/(3-1)) - another test equation
 
 
 def solve(calculation):
-    precedence = {"^": 5, "/": 4, "*": 3, "+": 2, "-": 2}
+    precedence = {"^": 4, "/": 3, "*": 2, "+": 1, "-": 1}
     bodmasIndex = []
-    highestOperatorIndex = 0
     calc = ""
 
     for i in range(len(calculation)):
@@ -13,38 +13,45 @@ def solve(calculation):
             if len(bodmasIndex) == 0:  # starts off the bodmasIndex list with a value (this is only executed once)
                 bodmasIndex.append(i)
             else:
-                highestOperatorIndex = i
                 for x in range(len(bodmasIndex)):  # for each of the values stored in bodmasIndex
-                    if precedence[calculation[i]] > precedence[calculation[bodmasIndex[x]]]:
+                    if precedence[calculation[i]] < precedence[calculation[bodmasIndex[-1]]]:
+                        bodmasIndex.append(i)
+                        break
+                    elif precedence[calculation[i]] > precedence[calculation[bodmasIndex[x]]]:
                         bodmasIndex.insert(x, i)  # insert the index value
                         break
                     elif precedence[calculation[i]] == precedence[calculation[bodmasIndex[x]]]:
-                        bodmasIndex.insert(x + 1, i)
-                        break
+                        if calculation[i] == "+" or calculation[i] == "-":
+                            bodmasIndex.append(i)
+                            break
+                        else:
+                            bodmasIndex.insert(x + 1, i)
+                            break
                     else:
-                        bodmasIndex.append(i)
-                        break
+                        continue
 
-    for i in range(len(bodmasIndex)):
-
+    while len(bodmasIndex) != 0:
         if calculation[bodmasIndex[0]] == '^':
-            currentCalculation = float(calculation[bodmasIndex[0] - 1]) ** float(calculation[bodmasIndex[0] + 1])
+            currentCalculation = calculation[bodmasIndex[0] - 1] ** calculation[bodmasIndex[0] + 1]
         elif calculation[bodmasIndex[0]] == '/':
-            currentCalculation = float(calculation[bodmasIndex[0] - 1]) / float(calculation[bodmasIndex[0] + 1])
+            currentCalculation = calculation[bodmasIndex[0] - 1] / calculation[bodmasIndex[0] + 1]
         elif calculation[bodmasIndex[0]] == '*':
-            currentCalculation = float(calculation[bodmasIndex[0] - 1]) * float(calculation[bodmasIndex[0] + 1])
+            currentCalculation = calculation[bodmasIndex[0] - 1] * calculation[bodmasIndex[0] + 1]
         elif calculation[bodmasIndex[0]] == '+':
-            currentCalculation = float(calculation[bodmasIndex[0] - 1]) + float(calculation[bodmasIndex[0] + 1])
+            currentCalculation = calculation[bodmasIndex[0] - 1] + calculation[bodmasIndex[0] + 1]
         else:
-            currentCalculation = float(calculation[bodmasIndex[0] - 1]) - float(calculation[bodmasIndex[0] + 1])
+            currentCalculation = calculation[bodmasIndex[0] - 1] - calculation[bodmasIndex[0] + 1]
 
-        calculation[bodmasIndex[0] - 1] = currentCalculation
-        calculation.pop(bodmasIndex[0] + 1)
+        calculation[bodmasIndex[0]-1] = currentCalculation
+        calculation.pop(bodmasIndex[0]+1)
         calculation.pop(bodmasIndex[0])
 
-        if len(calculation) != 1:
-            bodmasIndex.remove(highestOperatorIndex)
-        highestOperatorIndex -= 2
+        for i in range(len(bodmasIndex)):
+            if bodmasIndex[i] > bodmasIndex[0]:
+                bodmasIndex.insert(i, bodmasIndex[i] - 2)
+                bodmasIndex.pop(i + 1)
+
+        bodmasIndex.pop(0)
 
     return calculation[0]
 
@@ -89,27 +96,31 @@ def calculator(calculation):
         return calculator(calculation)
 
 
+def intChecker(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
+
+
 def calcInput():
     calcArray = []
     calculation = input('Enter your calculation: ')
-    done = []
+    num = ""
 
     for i in range(len(calculation)):
-        try:
-            if i in done:
-                continue
-            elif isinstance(int(calculation[i]), int):
-                num = calculation[i]
-                for x in range(i+1, len(calculation[i + 1:])):
-                    try:
-                        if isinstance(int(calculation[x]), int):
-                            num = num + calculation[x]
-                            done.append(x)
-                    except ValueError:
-                        break
+        if intChecker(calculation[i]):
+            num = num + calculation[i]
+            if i == len(calculation)-1:
                 calcArray.append(int(num))
-        except ValueError:
-            calcArray.append(calculation[i])
+        else:
+            if num == "":
+                calcArray.append(calculation[i])
+            else:
+                calcArray.append(int(num))
+                calcArray.append(calculation[i])
+                num = ""
 
     return calculator(calcArray)
 
