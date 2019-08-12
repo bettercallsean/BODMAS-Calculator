@@ -96,21 +96,13 @@ def calculator(calculation):
         return calculator(calculation)
 
 
-def intChecker(value):
-    try:
-        int(value)
-        return True
-    except ValueError:
-        return False
-
-
 def calcInput():
     calcArray = []
     calculation = input('Enter your calculation: ')
     num = ""
 
     for i in range(len(calculation)):
-        if intChecker(calculation[i]):
+        if calculation[i].isnumeric():
             num = num + calculation[i]
             if i == len(calculation)-1:
                 calcArray.append(int(num))
