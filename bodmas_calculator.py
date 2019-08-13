@@ -1,5 +1,9 @@
+#!/usr/bin/env python3
+# bodmas_calculator.py - A rule-based calculator that follows the rules of BODMAS/PEDMAS 
+
 # 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself
 # 7^3+3*(4*5-2^2-28/7+3)+9+((3+5)/(3-1)) - another test equation
+# ((3+(2*2)-7)^2)+(((2*2)+3-5)^2)
 
 
 def solve(calculation):
@@ -31,6 +35,7 @@ def solve(calculation):
                         continue
 
     while len(bodmasIndex) != 0:
+        # Performs calculations on the numbers on either side of the operator 
         if calculation[bodmasIndex[0]] == '^':
             currentCalculation = calculation[bodmasIndex[0] - 1] ** calculation[bodmasIndex[0] + 1]
         elif calculation[bodmasIndex[0]] == '/':
@@ -56,7 +61,8 @@ def solve(calculation):
     return calculation[0]
 
 
-def bracketSolver(calculation):
+def bracket_solver(calculation):
+    # Pairs brackets together, so that the program knows which calculations to work out first
     startBracketIndex = []
     endBracketIndex = []
     bracketPairs = {}
@@ -69,9 +75,7 @@ def bracketSolver(calculation):
 
     for i in range(len(startBracketIndex) - 1, -1, -1):
         for x in range(len(endBracketIndex)):
-            if endBracketIndex[x] < startBracketIndex[i]:
-                continue
-            elif endBracketIndex[x] in bracketPairs.values():
+            if endBracketIndex[x] < startBracketIndex[i] or endBracketIndex[x] in bracketPairs.values():
                 continue
             else:
                 bracketPairs[startBracketIndex[i]] = endBracketIndex[x]
@@ -82,11 +86,11 @@ def bracketSolver(calculation):
 
 
 def calculator(calculation):
-    brackets = bracketSolver(calculation)
+    brackets = bracket_solver(calculation)
     ans = []
 
     if brackets is None:
-        return solve(calculation)
+        return int(solve(calculation))
     else:
         s = list(brackets.keys())[0]
         e = brackets[s]
@@ -96,19 +100,34 @@ def calculator(calculation):
         return calculator(calculation)
 
 
-def calcInput():
+def calc_input():
+    # Splits the calculation into an array of integers and BODMAS operators
+
     calcArray = []
     calculation = input('Enter your calculation: ')
     num = ""
 
     for i in range(len(calculation)):
+
+        # If the current value is an int
         if calculation[i].isnumeric():
+            # Because the equation is stored as a string, the numbers can be
+            # appended to (e.g. the string '34' can have '6' appended to it, so it becomes '346')
             num = num + calculation[i]
+
+            # If the current iteration value is the last in the calculation, it can simply be appended,
+            # as there will be nothing left to append to the array after
             if i == len(calculation)-1:
                 calcArray.append(int(num))
         else:
+            #If the value being stored is not an int, it will be a BODMAS operator
+
+            # If there is no number currently being held in num, then the operator can be appended to the array 
             if num == "":
                 calcArray.append(calculation[i])
+            
+            # Else, if there is a number currently being held in num, append it to the array and then append the operator after it
+            # Then reset the num variable to be empty, ready for the next lot of numbers to be stored in it.
             else:
                 calcArray.append(int(num))
                 calcArray.append(calculation[i])
@@ -117,5 +136,5 @@ def calcInput():
     return calculator(calcArray)
 
 
-ans = calcInput()
+ans = calc_input()
 print(ans)
