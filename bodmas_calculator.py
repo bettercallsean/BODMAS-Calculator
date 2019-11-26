@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# bodmas_calculator.py - A rule-based calculator that follows the rules of BODMAS/PEDMAS 
+#!/usr/local/env python3
+# bodas_calc.py - A rule-based calculator that follows the rules of BODMAS
 
 # 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself
 # 7^3+3*(4*5-2^2-28/7+3)+9+((3+5)/(3-1)) - another test equation
@@ -7,95 +7,98 @@
 
 
 def solve(calculation):
-    precedence = {"^": 4, "/": 3, "*": 2, "+": 1, "-": 1}
-    bodmasIndex = []
+    operator_precedence = {"^": 4, "/": 3, "*": 2, "+": 1, "-": 1}
+    bodmas_index = []
     calc = ""
 
     for i in range(len(calculation)):
         calc += str(calculation[i])
-        if calculation[i] in precedence:
-            if len(bodmasIndex) == 0:  # starts off the bodmasIndex list with a value (this is only executed once)
-                bodmasIndex.append(i)
+        if calculation[i] in operator_precedence:
+            if len(bodmas_index) == 0:  # starts off the bodmas_index list with a value (this is only executed once)
+                bodmas_index.append(i)
             else:
-                for x in range(len(bodmasIndex)):  # for each of the values stored in bodmasIndex
-                    if precedence[calculation[i]] < precedence[calculation[bodmasIndex[-1]]]:
-                        bodmasIndex.append(i)
+                for x in range(len(bodmas_index)):  # for each of the values stored in bodmas_index
+                    if operator_precedence[calculation[i]] < operator_precedence[calculation[bodmas_index[-1]]]:
+                        bodmas_index.append(i)
                         break
-                    elif precedence[calculation[i]] > precedence[calculation[bodmasIndex[x]]]:
-                        bodmasIndex.insert(x, i)  # insert the index value
+                    elif operator_precedence[calculation[i]] > operator_precedence[calculation[bodmas_index[x]]]:
+                        bodmas_index.insert(x, i)  # insert the index value
                         break
-                    elif precedence[calculation[i]] == precedence[calculation[bodmasIndex[x]]]:
+                    elif operator_precedence[calculation[i]] == operator_precedence[calculation[bodmas_index[x]]]:
                         if calculation[i] == "+" or calculation[i] == "-":
-                            bodmasIndex.append(i)
+                            bodmas_index.append(i)
                             break
                         else:
-                            bodmasIndex.insert(x + 1, i)
+                            bodmas_index.insert(x + 1, i)
                             break
                     else:
                         continue
 
-    while len(bodmasIndex) != 0:
+    while len(bodmas_index) != 0:
         # Performs calculations on the numbers on either side of the operator 
-        if calculation[bodmasIndex[0]] == '^':
-            currentCalculation = calculation[bodmasIndex[0] - 1] ** calculation[bodmasIndex[0] + 1]
-        elif calculation[bodmasIndex[0]] == '/':
-            currentCalculation = calculation[bodmasIndex[0] - 1] / calculation[bodmasIndex[0] + 1]
-        elif calculation[bodmasIndex[0]] == '*':
-            currentCalculation = calculation[bodmasIndex[0] - 1] * calculation[bodmasIndex[0] + 1]
-        elif calculation[bodmasIndex[0]] == '+':
-            currentCalculation = calculation[bodmasIndex[0] - 1] + calculation[bodmasIndex[0] + 1]
+        if calculation[bodmas_index[0]] == '^':
+            currentCalculation = calculation[bodmas_index[0] - 1] ** calculation[bodmas_index[0] + 1]
+        elif calculation[bodmas_index[0]] == '/':
+            currentCalculation = calculation[bodmas_index[0] - 1] / calculation[bodmas_index[0] + 1]
+        elif calculation[bodmas_index[0]] == '*':
+            currentCalculation = calculation[bodmas_index[0] - 1] * calculation[bodmas_index[0] + 1]
+        elif calculation[bodmas_index[0]] == '+':
+            currentCalculation = calculation[bodmas_index[0] - 1] + calculation[bodmas_index[0] + 1]
         else:
-            currentCalculation = calculation[bodmasIndex[0] - 1] - calculation[bodmasIndex[0] + 1]
+            currentCalculation = calculation[bodmas_index[0] - 1] - calculation[bodmas_index[0] + 1]
 
-        calculation[bodmasIndex[0]-1] = currentCalculation
-        calculation.pop(bodmasIndex[0]+1)
-        calculation.pop(bodmasIndex[0])
+        calculation[bodmas_index[0]-1] = currentCalculation
+        calculation.pop(bodmas_index[0]+1)
+        calculation.pop(bodmas_index[0])
 
-        for i in range(len(bodmasIndex)):
-            if bodmasIndex[i] > bodmasIndex[0]:
-                bodmasIndex.insert(i, bodmasIndex[i] - 2)
-                bodmasIndex.pop(i + 1)
+        for i in range(len(bodmas_index)):
+            if bodmas_index[i] > bodmas_index[0]:
+                bodmas_index.insert(i, bodmas_index[i] - 2)
+                bodmas_index.pop(i + 1)
 
-        bodmasIndex.pop(0)
+        bodmas_index.pop(0)
 
     return calculation[0]
 
 
-def bracket_solver(calculation):
+def bracket_pair_finder(calculation):
     # Pairs brackets together, so that the program knows which calculations to work out first
-    startBracketIndex = []
-    endBracketIndex = []
-    bracketPairs = {}
+    start_bracket_index_array = []
+    end_bracket_index_array = []
+    bracket_pairs = {}
 
     for i in range(len(calculation)):
         if calculation[i] == '(':
-            startBracketIndex.append(i)
+            start_bracket_index_array.append(i)
         elif calculation[i] == ')':
-            endBracketIndex.append(i)
+            end_bracket_index_array.append(i)
 
-    for i in range(len(startBracketIndex) - 1, -1, -1):
-        for x in range(len(endBracketIndex)):
-            if endBracketIndex[x] < startBracketIndex[i] or endBracketIndex[x] in bracketPairs.values():
+    # Finds the innermost brackets so that they can be solved first
+    # Only returns one pair of brackets at a time. 
+    # If all of them were returned, they could potentially be solved recursively, but I haven't tried it
+    for i in range(len(start_bracket_index_array) - 1, -1, -1):
+        for x in range(len(end_bracket_index_array)):
+            if end_bracket_index_array[x] < start_bracket_index_array[i] or end_bracket_index_array[x] in bracket_pairs.values():
                 continue
             else:
-                bracketPairs[startBracketIndex[i]] = endBracketIndex[x]
+                bracket_pairs[start_bracket_index_array[i]] = end_bracket_index_array[x]
                 break
         break
-    if len(bracketPairs) != 0:
-        return bracketPairs
+    if len(bracket_pairs) != 0:
+        return bracket_pairs
 
 
 def calculator(calculation):
-    brackets = bracket_solver(calculation)
-    ans = []
+    brackets = bracket_pair_finder(calculation)
+    answer = []
 
     if brackets is None:
         return int(solve(calculation))
     else:
-        s = list(brackets.keys())[0]
-        e = brackets[s]
-        ans.append(solve(calculation[s + 1:e]))
-        calculation = calculation[:s] + ans + calculation[e + 1:]
+        start_bracket_index = list(brackets.keys())[0]
+        end_bracket_index = brackets[start_bracket_index]
+        answer.append(solve(calculation[start_bracket_index + 1:end_bracket_index]))
+        calculation = calculation[:start_bracket_index] + answer + calculation[end_bracket_index + 1:]
         print(calculation)
         return calculator(calculation)
 
@@ -103,9 +106,9 @@ def calculator(calculation):
 def calc_input():
     # Splits the calculation into an array of integers and BODMAS operators
 
-    calcArray = []
+    calculation_array = []
     calculation = input('Enter your calculation: ')
-    num = ""
+    number = ""
 
     for i in range(len(calculation)):
 
@@ -113,28 +116,28 @@ def calc_input():
         if calculation[i].isnumeric():
             # Because the equation is stored as a string, the numbers can be
             # appended to (e.g. the string '34' can have '6' appended to it, so it becomes '346')
-            num = num + calculation[i]
+            number = number + calculation[i]
 
             # If the current iteration value is the last in the calculation, it can simply be appended,
             # as there will be nothing left to append to the array after
             if i == len(calculation)-1:
-                calcArray.append(int(num))
+                calculation_array.append(int(number))
         else:
             #If the value being stored is not an int, it will be a BODMAS operator
 
-            # If there is no number currently being held in num, then the operator can be appended to the array 
-            if num == "":
-                calcArray.append(calculation[i])
+            # If there is no number currently being held in number, then the operator can be appended to the array 
+            if number == "":
+                calculation_array.append(calculation[i])
             
-            # Else, if there is a number currently being held in num, append it to the array and then append the operator after it
-            # Then reset the num variable to be empty, ready for the next lot of numbers to be stored in it.
+            # Else, if there is a number currently being held in number, append it to the array and then append the operator after it
+            # Then reset the number variable to be empty, ready for the next lot of numbers to be stored in it.
             else:
-                calcArray.append(int(num))
-                calcArray.append(calculation[i])
-                num = ""
+                calculation_array.append(int(number))
+                calculation_array.append(calculation[i])
+                number = ""
 
-    return calculator(calcArray)
+    return calculator(calculation_array)
 
 
-ans = calc_input()
-print(ans)
+answer = calc_input()
+print(answer)
