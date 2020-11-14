@@ -93,7 +93,7 @@ def calculator(calculation):
     answer = []
 
     if brackets is None:
-        return int(solve(calculation))
+        return float(solve(calculation))
     else:
         start_bracket_index = list(brackets.keys())[0]
         end_bracket_index = brackets[start_bracket_index]
@@ -113,7 +113,7 @@ def calc_input():
     for i in range(len(calculation)):
 
         # If the current value is an int
-        if calculation[i].isnumeric():
+        if calculation[i].isnumeric() or calculation[i] == ".":
             # Because the equation is stored as a string, the numbers can be
             # appended to (e.g. the string '34' can have '6' appended to it, so it becomes '346')
             number = number + calculation[i]
@@ -121,7 +121,7 @@ def calc_input():
             # If the current iteration value is the last in the calculation, it can simply be appended,
             # as there will be nothing left to append to the array after
             if i == len(calculation)-1:
-                calculation_array.append(int(number))
+                calculation_array.append(float(number))
         else:
             #If the value being stored is not an int, it will be a BODMAS operator
 
@@ -132,7 +132,7 @@ def calc_input():
             # Else, if there is a number currently being held in number, append it to the array and then append the operator after it
             # Then reset the number variable to be empty, ready for the next lot of numbers to be stored in it.
             else:
-                calculation_array.append(int(number))
+                calculation_array.append(float(number))
                 calculation_array.append(calculation[i])
                 number = ""
 
