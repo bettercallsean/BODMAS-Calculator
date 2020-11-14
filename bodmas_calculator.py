@@ -1,5 +1,5 @@
 #!/usr/local/env python3
-# bodas_calc.py - A rule-based calculator that follows the rules of BODMAS
+# bodmas_calc.py - A rule-based calculator that follows the rules of BODMAS
 
 # 3+((4+6)*9/(2-16+8*(3^2+7)))/3*6*4-7 - copy and paste this if you can't think of a calculation yourself
 # 7^3+3*(4*5-2^2-28/7+3)+9+((3+5)/(3-1)) - another test equation
@@ -8,21 +8,25 @@
 
 def solve(calculation):
     operator_precedence = {"^": 4, "/": 3, "*": 2, "+": 1, "-": 1}
-    bodmas_index = []
-    calc = ""
+
+    # bodmas_index will store the index of all the operators in the equation
+    # The order of the list is the order in which the calculation will be performed
+    bodmas_index = [] 
 
     for i in range(len(calculation)):
-        calc += str(calculation[i])
         if calculation[i] in operator_precedence:
             if len(bodmas_index) == 0:  # starts off the bodmas_index list with a value (this is only executed once)
                 bodmas_index.append(i)
             else:
-                for x in range(len(bodmas_index)):  # for each of the values stored in bodmas_index
+                # Loops through the current indexes of operators and works out the order in which the operators need to be 
+                # arranged by comparing the operator_precedence values and seeing if a particular operator needs to be worked on
+                # before or after another one (e.g all * operations will need to be performed before all - operations)
+                for x in range(len(bodmas_index)): 
                     if operator_precedence[calculation[i]] < operator_precedence[calculation[bodmas_index[-1]]]:
                         bodmas_index.append(i)
                         break
                     elif operator_precedence[calculation[i]] > operator_precedence[calculation[bodmas_index[x]]]:
-                        bodmas_index.insert(x, i)  # insert the index value
+                        bodmas_index.insert(x, i) 
                         break
                     elif operator_precedence[calculation[i]] == operator_precedence[calculation[bodmas_index[x]]]:
                         if calculation[i] == "+" or calculation[i] == "-":
@@ -35,22 +39,29 @@ def solve(calculation):
                         continue
 
     while len(bodmas_index) != 0:
-        # Performs calculations on the numbers on either side of the operator 
+        # Loops through the operator indexes from left to right and performs the required operation, storing the result
+        # in calculation_result
         if calculation[bodmas_index[0]] == '^':
-            currentCalculation = calculation[bodmas_index[0] - 1] ** calculation[bodmas_index[0] + 1]
+            calculation_result = calculation[bodmas_index[0] - 1] ** calculation[bodmas_index[0] + 1]
         elif calculation[bodmas_index[0]] == '/':
-            currentCalculation = calculation[bodmas_index[0] - 1] / calculation[bodmas_index[0] + 1]
+            calculation_result = calculation[bodmas_index[0] - 1] / calculation[bodmas_index[0] + 1]
         elif calculation[bodmas_index[0]] == '*':
-            currentCalculation = calculation[bodmas_index[0] - 1] * calculation[bodmas_index[0] + 1]
+            calculation_result = calculation[bodmas_index[0] - 1] * calculation[bodmas_index[0] + 1]
         elif calculation[bodmas_index[0]] == '+':
-            currentCalculation = calculation[bodmas_index[0] - 1] + calculation[bodmas_index[0] + 1]
+            calculation_result = calculation[bodmas_index[0] - 1] + calculation[bodmas_index[0] + 1]
         else:
-            currentCalculation = calculation[bodmas_index[0] - 1] - calculation[bodmas_index[0] + 1]
+            calculation_result = calculation[bodmas_index[0] - 1] - calculation[bodmas_index[0] + 1]
 
-        calculation[bodmas_index[0]-1] = currentCalculation
+        # calculation_result stores the result which is then inserted into the equation in place of the 
+        # two values and operator that was used to calculate it.
+        calculation[bodmas_index[0]-1] = calculation_result
         calculation.pop(bodmas_index[0]+1)
         calculation.pop(bodmas_index[0])
 
+        # Any operator indexes that are higher than the index stored at bodmas_index[0] will need to have their index position shifted by -2 
+        # to accommodate for the shortening calculation. It's been about 2 years since I wrote this code and I never commented on its behaviour,
+        # so here I am 2 years later trying to remember why I chose to do the loop this way. 
+        print(bodmas_index)
         for i in range(len(bodmas_index)):
             if bodmas_index[i] > bodmas_index[0]:
                 bodmas_index.insert(i, bodmas_index[i] - 2)
