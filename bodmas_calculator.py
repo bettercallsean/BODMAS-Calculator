@@ -163,5 +163,6 @@ def calc_input():
     return calculator(calculation_array)
 
 
-answer = calc_input()
-print(answer)
+if __name__ == "__main__":
+    answer = calc_input()
+    print(answer)
